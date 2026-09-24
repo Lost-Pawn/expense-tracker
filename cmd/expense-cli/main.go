@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 	"time"
 )
@@ -50,6 +51,10 @@ func main() {
 
 		}
 	case "list":
+		listCmd := flag.NewFlagSet("list", flag.ExitOnError)
+		filter := listCmd.String("filter", "", "Filter expenses by description")
+		listCmd.Parse(os.Args[2:])
+
 		if len(loadExpenses) == 0 {
 			fmt.Println("No expenses found")
 			return
@@ -58,8 +63,16 @@ func main() {
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.Debug)
 		fmt.Fprintln(w, "ID\tDate\tDescription\tAmount")
 
+		matched := 0
 		for _, expense := range loadExpenses {
-			fmt.Fprintf(w, "%d\t%s\t%s\t%.2f\n", expense.ID, expense.Date.Format("2006-01-02"), expense.Description, expense.Amount)
+			if *filter == "" || strings.Contains(strings.ToLower(expense.Description), strings.ToLower(*filter)){
+				matched++
+				fmt.Fprintf(w, "%d\t%s\t%s\t%.2f\n", expense.ID, expense.Date.Format("2006-01-02"), expense.Description, expense.Amount)
+			}
+		}
+		if matched == 0 {
+			fmt.Println("No expenses found matching the filter")
+			return
 		}
 		w.Flush()
 	case "delete":
