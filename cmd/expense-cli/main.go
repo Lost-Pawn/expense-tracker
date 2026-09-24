@@ -85,6 +85,7 @@ func main() {
 				}
 			}
 		}
+		fmt.Printf("No expense found with ID:%d\n", *id)
 	case "summary":
 		fmt.Println("summary func")
 	case "update":
