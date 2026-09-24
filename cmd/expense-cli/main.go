@@ -1,12 +1,13 @@
 package main
 
 import (
-	"flag"
-	"time"
-	"fmt"
-	"os"
 	"expense-tracker/internal/storage"
 	"expense-tracker/internal/task"
+	"flag"
+	"fmt"
+	"os"
+	"text/tabwriter"
+	"time"
 )
 
 func main() {
@@ -49,9 +50,41 @@ func main() {
 
 		}
 	case "list":
-		fmt.Println("list func")
+		if len(loadExpenses) == 0 {
+			fmt.Println("No expenses found")
+			return
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.Debug)
+		fmt.Fprintln(w, "ID\tDate\tDescription\tAmount")
+
+		for _, expense := range loadExpenses {
+			fmt.Fprintf(w, "%d\t%s\t%s\t%.2f\n", expense.ID, expense.Date.Format("2006-01-02"), expense.Description, expense.Amount)
+		}
+		w.Flush()
 	case "delete":
-		fmt.Println("delete func")
+		deleteCmd := flag.NewFlagSet("delete", flag.ExitOnError)
+		id := deleteCmd.Int("id", 0, "ID of the expense to delete")
+		deleteCmd.Parse(os.Args[2:])
+
+		if *id <= 0 {
+			fmt.Println("Please provide a valid ID")
+			return
+		}
+
+		for i, expenses := range loadExpenses{
+			if expenses.ID == *id {
+				loadExpenses = append(loadExpenses[:i], loadExpenses[i+1:]...)
+				err = storage.SaveExpenses(loadExpenses)
+				if err != nil {
+					fmt.Printf("Error saving expenses: %v\n", err)
+					return
+				} else {
+					fmt.Printf("Deleted expense with ID: %d\n", *id)
+					return
+				}
+			}
+		}
 	case "summary":
 		fmt.Println("summary func")
 	case "update":
