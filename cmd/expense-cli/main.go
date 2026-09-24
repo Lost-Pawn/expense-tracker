@@ -54,8 +54,9 @@ func main() {
 			return
 		} else {
 			fmt.Printf("Adding expense: %s, Amount: %.2f\n", *description, *amount)
-
+			task.CheckBudget(loadExpenses, loadBudgets, int(time.Now().UTC().Month()))
 		}
+
 	case "list":
 		listCmd := flag.NewFlagSet("list", flag.ExitOnError)
 		filter := listCmd.String("filter", "", "Filter expenses by description")
@@ -110,7 +111,7 @@ func main() {
 		month := summaryCmd.Int("month", 0, "Month for the summary (1-12)")
 		summaryCmd.Parse(os.Args[2:])
 
-		if *month < 1 || *month > 12 {
+		if *month < 0 || *month > 12 {
 			fmt.Println("Please provide a valid month (1-12)")
 			return
 		}
@@ -159,6 +160,7 @@ func main() {
 					return
 				} else {
 					fmt.Printf("Updated expense with ID: %d\n", *id)
+					task.CheckBudget(loadExpenses, loadBudgets, int(loadExpenses[i].Date.Month()))
 					return
 				}
 			}			
