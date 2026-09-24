@@ -109,7 +109,42 @@ func main() {
 			fmt.Printf("Total expenses: %.2f\n", total)
 		}
 	case "update":
-		
+		updateCmd := flag.NewFlagSet("update", flag.ExitOnError)
+		id := updateCmd.Int("id", 0, "ID of the expense to update")
+		description := updateCmd.String("description", "", "New description of the expense")
+		amount := updateCmd.Float64("amount", 0, "New amount of the expense")
+		updateCmd.Parse(os.Args[2:])
+
+		if *id <= 0 {
+        fmt.Println("Please provide a valid ID")
+        return
+    	}
+
+		if *description == "" && *amount <= 0 {
+			fmt.Println("Please provide a new description and/or amount")
+			return
+		}
+
+		for i, expense := range loadExpenses {
+			if expense.ID == *id {
+				if *description != "" {
+					loadExpenses[i].Description = *description
+				}
+				if *amount > 0 {
+					loadExpenses[i].Amount = *amount
+				}
+
+				err = storage.SaveExpenses(loadExpenses)
+				if err != nil {
+					fmt.Printf("Error saving expenses: %v\n", err)
+					return
+				} else {
+					fmt.Printf("Updated expense with ID: %d\n", *id)
+					return
+				}
+			}			
+		}
+		fmt.Printf("No expense found with ID:%d\n", *id)
 	case "set-budget":
 		fmt.Println("set-budget func")
 	case "help":
