@@ -8,6 +8,11 @@ import (
 func main() {
 	fmt.Println("Getting started with Expanse CLI")
 
+	if (len(os.Args) < 2) {
+		fmt.Println("Please provide a command")
+		return
+	}
+
 	switch (os.Args[1]) {
 	case "add":
 		fmt.Println("add func")
@@ -21,6 +26,8 @@ func main() {
 		fmt.Println("update func")
 	case "set-budget":
 		fmt.Println("set-budget func")
+	case "help":
+		fmt.Println("help func")
 	default:
 		fmt.Println("Invalid command")
 	}
