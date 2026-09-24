@@ -11,6 +11,11 @@ type Expense struct {
     Amount      float64 	`json:"amount"`
 }
 
+type Budget struct {
+    Month   int     `json:"month"`
+    Amount  float64 `json:"amount"`
+}
+
 func NextID(expenses []Expense) int {
     maxID := 0
     for _, expense := range expenses {
