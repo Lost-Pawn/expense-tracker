@@ -87,9 +87,29 @@ func main() {
 		}
 		fmt.Printf("No expense found with ID:%d\n", *id)
 	case "summary":
-		fmt.Println("summary func")
+		summaryCmd := flag.NewFlagSet("summary", flag.ExitOnError)
+		month := summaryCmd.Int("month", 0, "Month for the summary (1-12)")
+		summaryCmd.Parse(os.Args[2:])
+
+		if *month < 1 || *month > 12 {
+			fmt.Println("Please provide a valid month (1-12)")
+			return
+		}
+		
+		var total float64
+		for _, expense := range loadExpenses {
+			if *month == 0 || int(expense.Date.Month()) == *month {
+				total += expense.Amount
+			}
+		}
+		
+		if *month > 0 {
+			fmt.Printf("Total expenses for month %d: %.2f\n", *month, total)
+		} else {
+			fmt.Printf("Total expenses: %.2f\n", total)
+		}
 	case "update":
-		fmt.Println("update func")
+		
 	case "set-budget":
 		fmt.Println("set-budget func")
 	case "help":
