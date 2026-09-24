@@ -2,15 +2,22 @@ package main
 
 import (
 	"flag"
+	"time"
 	"fmt"
 	"os"
+	"expense-tracker/internal/storage"
+	"expense-tracker/internal/task"
 )
 
 func main() {
-	fmt.Println("Getting started with Expense CLI")
-
 	if len(os.Args) < 2 {
 		fmt.Println("Please provide a command")
+		return
+	}
+	
+	loadExpenses, err := storage.LoadExpenses()
+	if err != nil {
+		fmt.Printf("Error loading expenses: %v\n", err)
 		return
 	}
 
@@ -26,8 +33,21 @@ func main() {
 			return
 		}
 
-		fmt.Printf("Adding expense: %s, Amount: %.2f\n", *description, *amount)
+		loadExpenses = append(loadExpenses, task.Expense{
+			ID:          task.NextID(loadExpenses),
+			Date:        time.Now().UTC(),
+			Description: *description,
+			Amount:      *amount,
+		})
 
+		err = storage.SaveExpenses(loadExpenses)
+		if err != nil {
+			fmt.Printf("Error saving expenses: %v\n", err)
+			return
+		} else {
+			fmt.Printf("Adding expense: %s, Amount: %.2f\n", *description, *amount)
+
+		}
 	case "list":
 		fmt.Println("list func")
 	case "delete":
