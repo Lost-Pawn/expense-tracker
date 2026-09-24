@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 )
@@ -8,14 +9,25 @@ import (
 func main() {
 	fmt.Println("Getting started with Expanse CLI")
 
-	if (len(os.Args) < 2) {
+	if len(os.Args) < 2 {
 		fmt.Println("Please provide a command")
 		return
 	}
 
-	switch (os.Args[1]) {
+	switch os.Args[1] {
 	case "add":
-		fmt.Println("add func")
+		addCmd := flag.NewFlagSet("add", flag.ExitOnError)
+		description := addCmd.String("description", "", "Description of the expense")
+		amount := addCmd.Float64("amount", 0, "Amount of the expense")
+		addCmd.Parse(os.Args[2:])
+
+		if *description == "" || *amount <= 0 {
+			fmt.Println("Please provide a valid description and amount")
+			return
+		}
+
+		fmt.Printf("Adding expense: %s, Amount: %f\n", *description, *amount)
+		
 	case "list":
 		fmt.Println("list func")
 	case "delete":
