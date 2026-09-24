@@ -23,6 +23,12 @@ func main() {
 		return
 	}
 
+	loadBudgets, err := storage.LoadBudgets()
+	if err != nil {
+		fmt.Printf("Error loading budgets: %v\n", err)
+		return
+	}
+
 	switch os.Args[1] {
 	case "add":
 		addCmd := flag.NewFlagSet("add", flag.ExitOnError)
@@ -159,7 +165,39 @@ func main() {
 		}
 		fmt.Printf("No expense found with ID:%d\n", *id)
 	case "set-budget":
-		fmt.Println("set-budget func")
+		budgetCmd := flag.NewFlagSet("set-budget", flag.ExitOnError)
+		month := budgetCmd.Int("month", 0, "Month for the budget (1-12)")
+		amount := budgetCmd.Float64("amount", 0, "Amount for the budget")
+		budgetCmd.Parse(os.Args[2:])
+
+		if *month < 1 || *month > 12 || *amount <= 0 {
+			fmt.Println("Please provide a valid month (1-12) and amount")
+			return
+		}
+		
+		found := false 
+		for i, budget := range loadBudgets {
+			if budget.Month == *month {
+				loadBudgets[i].Amount = *amount
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			loadBudgets = append(loadBudgets, task.Budget{
+				Month:  *month,
+				Amount: *amount,
+			})
+		}
+
+		err = storage.SaveBudgets(loadBudgets)
+		if err != nil {
+			fmt.Printf("Error saving budgets: %v\n", err)
+			return
+		} else {
+			fmt.Printf("Set budget for month %d to %.2f\n", *month, *amount)
+		}
 	case "help":
 		fmt.Println("help func")
 	default:
