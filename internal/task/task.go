@@ -2,6 +2,7 @@ package task
 
 import (
 	"time"
+    "fmt"
 )
 
 type Expense struct {
@@ -24,4 +25,22 @@ func NextID(expenses []Expense) int {
         }
     }
     return maxID + 1
+}
+
+func CheckBudget(expenses []Expense, budgets []Budget, month int) {
+    var total float64
+    for _, expense := range expenses {
+        if int(expense.Date.Month()) == month {
+            total += expense.Amount
+        }
+    }
+
+    for _, budget := range budgets {
+        if budget.Month == month {
+            if total > budget.Amount {
+                fmt.Printf("Warning: You have exceeded your budget for month %d! (%.2f / %.2f)\n", month, total, budget.Amount)
+            }
+            return
+        }
+    }
 }
