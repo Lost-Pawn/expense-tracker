@@ -201,7 +201,14 @@ func main() {
 			fmt.Printf("Set budget for month %d to %.2f\n", *month, *amount)
 		}
 	case "help":
-		fmt.Println("help func")
+		fmt.Println("Available commands:")
+		fmt.Println("  add -description <description> -amount <amount> : Add a new expense")
+		fmt.Println("  list [-filter <filter>] : List all expenses, optionally filtered by description")
+		fmt.Println("  delete -id <id> : Delete an expense by ID")
+		fmt.Println("  update -id <id> [-description <description>] [-amount <amount>] : Update an expense by ID")
+		fmt.Println("  summary [-month <month>] : Show total expenses, optionally for a specific month")
+		fmt.Println("  set-budget -month <month> -amount <amount> : Set a budget for a specific month")
+		fmt.Println("  help : Show this help message")
 	default:
 		fmt.Println("Invalid command")
 	}
